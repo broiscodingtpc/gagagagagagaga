@@ -417,21 +417,6 @@ cat > web/dist/index.html << 'EOF'
           if (response.ok) {
             const data = await response.json();
             addMessage(data.text || data.reply, 'assistant');
-            
-            // Display image if generated
-            if (data.imageUrl) {
-              const imageMessage = document.createElement('div');
-              imageMessage.className = 'message assistant';
-              const img = document.createElement('img');
-              img.src = data.imageUrl;
-              img.style.maxWidth = '100%';
-              img.style.borderRadius = '8px';
-              img.style.marginTop = '8px';
-              imageMessage.appendChild(img);
-              chatMessages.appendChild(imageMessage);
-              chatMessages.scrollTop = chatMessages.scrollHeight;
-            }
-            
             energy = Math.max(40, energy - 10);
           } else {
             addMessage('🔮 The oracle is temporarily unavailable. Try again, Node.', 'assistant');

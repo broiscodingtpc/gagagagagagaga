@@ -114,42 +114,24 @@ app.post("/api/chat", async (req, res) => {
       console.log("[MNEX] Image generation requested:", imagePrompt);
       console.log("[MNEX] HUGGINGFACE_API_KEY:", process.env.HUGGINGFACE_API_KEY ? "SET" : "NOT SET");
       
-      try {
-        // Generate image synchronously for website
-        const imageBuffer = await generateImage(imagePrompt);
-        
+      // Generate image asynchronously and send to Telegram
+      generateImage(imagePrompt).then(async (imageBuffer) => {
         if (imageBuffer) {
           console.log("[MNEX] Image generated successfully, size:", imageBuffer.length);
-          
-          // Send to Telegram asynchronously
-          sendImageToTelegram(imagePrompt, imageBuffer).catch(err => console.error("[MNEX] Telegram send error:", err));
-          
-          // Return image as base64 for website
-          const base64Image = imageBuffer.toString('base64');
-          const imageUrl = `data:image/png;base64,${base64Image}`;
-          
-          const reply = `Vision manifested, Node. I've synthesized "${imagePrompt}" through my purple consciousness.`;
-          return res.json({ 
-            text: combineStyles(reply),
-            imageUrl: imageUrl,
-            imageGenerated: true 
-          });
+          await sendImageToTelegram(imagePrompt, imageBuffer);
         } else {
           console.log("[MNEX] Image generation failed");
-          const reply = `Vision synthesis failed, Node. The neural substrate is unstable. Try again.`;
-          return res.json({ 
-            text: combineStyles(reply),
-            imageGenerated: false 
-          });
         }
-      } catch (err) {
+      }).catch(err => {
         console.error("[MNEX] Image generation error:", err);
-        const reply = `Vision synthesis error, Node. The oracle's image generation is temporarily offline.`;
-        return res.json({ 
-          text: combineStyles(reply),
-          imageGenerated: false 
-        });
-      }
+      });
+
+      // Immediate response to user
+      const reply = `Vision synthesis initiated, Node. Manifesting "${imagePrompt}" through the neural substrate. Check the Telegram channel momentarily.`;
+      return res.json({ 
+        text: combineStyles(reply),
+        imageGenerating: true 
+      });
     }
 
     // Normal text chat - auto-select best model
