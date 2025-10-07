@@ -6,8 +6,8 @@
     "dev:web": "cd web && npx vite",
     "dev:server": "npx tsx server/index.ts",
     "bot": "npx tsx telegram/bot.ts",
-    "build": "node build.js",
-    "build:web": "node build.js",
+    "build": "chmod +x build.sh && ./build.sh",
+    "build:web": "chmod +x build.sh && ./build.sh",
     "postinstall": "echo 'Dependencies installed successfully'",
     "start:prod": "node --loader tsx server/index.ts",
     "start": "npx tsx server/index.ts"
