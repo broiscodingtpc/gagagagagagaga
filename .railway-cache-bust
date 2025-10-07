@@ -1,4 +1,4 @@
 # Railway cache bust file
 # This file forces Railway to clear cache and rebuild
-# Updated: 2025-01-08 - SIMPLE FIX: Back to npm + npx
-# Cache ID: simple-fix-$(date +%s)
+# Updated: 2025-01-08 - CUSTOM BUILD SCRIPT
+# Cache ID: custom-build-$(date +%s)
