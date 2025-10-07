@@ -1,7 +1,7 @@
 {
   "name": "mnex-oracle",
   "private": true,
-  "packageManager": "yarn@4.0.0",
+  "packageManager": "yarn@3.6.4",
   "scripts": {
     "dev": "concurrently \"npm:dev:web\" \"npm:dev:server\"",
     "dev:web": "cd web && npx vite",
