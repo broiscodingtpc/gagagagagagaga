@@ -19,6 +19,15 @@ if (process.env.NODE_ENV === 'production') {
   const distPath = path.join(__dirname, '../web/dist');
   app.use(express.static(distPath));
   console.log(`[MNEX] Serving static files from ${distPath}`);
+  
+  // Debug: Check if dist directory exists
+  if (fs.existsSync(distPath)) {
+    console.log(`[MNEX] ✅ Dist directory exists: ${distPath}`);
+    const files = fs.readdirSync(distPath);
+    console.log(`[MNEX] Files in dist:`, files);
+  } else {
+    console.log(`[MNEX] ❌ Dist directory NOT found: ${distPath}`);
+  }
 }
 
 // Dev-controlled learning only
