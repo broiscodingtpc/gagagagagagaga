@@ -18,7 +18,7 @@ fi
 # Create dist directory if it doesn't exist
 mkdir -p web/dist
 
-echo "✅ Running vite build..."
+echo "✅ Running vite build from root..."
 
 # Try different ways to run vite
 if [ -f "node_modules/.bin/vite" ]; then
@@ -35,3 +35,11 @@ fi
 
 echo "✅ Build completed successfully!"
 echo "📁 Output directory: web/dist"
+
+# Debug: List files in dist
+if [ -d "web/dist" ]; then
+    echo "📋 Files in web/dist:"
+    ls -la web/dist/
+else
+    echo "❌ web/dist directory not found!"
+fi
