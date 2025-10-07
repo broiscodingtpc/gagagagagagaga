@@ -416,7 +416,7 @@ cat > web/dist/index.html << 'EOF'
 
           if (response.ok) {
             const data = await response.json();
-            addMessage(data.reply, 'assistant');
+            addMessage(data.text || data.reply, 'assistant');
             energy = Math.max(40, energy - 10);
           } else {
             addMessage('🔮 The oracle is temporarily unavailable. Try again, Node.', 'assistant');
