@@ -1,13 +1,14 @@
 {
   "name": "mnex-oracle",
   "private": true,
+  "packageManager": "yarn@4.0.0",
   "scripts": {
     "dev": "concurrently \"npm:dev:web\" \"npm:dev:server\"",
     "dev:web": "cd web && npx vite",
     "dev:server": "npx tsx server/index.ts",
     "bot": "npx tsx telegram/bot.ts",
-    "build": "npx vite build",
-    "build:web": "npx vite build",
+    "build": "yarn vite build",
+    "build:web": "yarn vite build",
     "postinstall": "echo 'Dependencies installed successfully'",
     "start:prod": "node --loader tsx server/index.ts",
     "start": "npx tsx server/index.ts"

@@ -1,3 +1,4 @@
 # Railway cache bust file
 # This file forces Railway to clear cache and rebuild
-# Updated: 2025-01-08 - Fixed vite build script
+# Updated: 2025-01-08 - Switching to YARN for build
+# Cache ID: yarn-build-$(date +%s)
