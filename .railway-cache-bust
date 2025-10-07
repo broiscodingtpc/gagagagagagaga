@@ -1,4 +1,4 @@
 # Railway cache bust file
 # This file forces Railway to clear cache and rebuild
-# Updated: 2025-01-08 - SHELL BUILD SCRIPT
-# Cache ID: shell-build-$(date +%s)
+# Updated: 2025-01-08 - FIX TSX LOADER
+# Cache ID: tsx-fix-$(date +%s)
