@@ -3,16 +3,17 @@
   "private": true,
   "scripts": {
     "dev": "concurrently \"npm:dev:web\" \"npm:dev:server\"",
-    "dev:web": "cd web && vite",
-    "dev:server": "tsx server/index.ts",
-    "bot": "tsx telegram/bot.ts",
-    "build": "cd web && vite build",
-    "build:web": "cd web && vite build",
+    "dev:web": "cd web && npx vite",
+    "dev:server": "npx tsx server/index.ts",
+    "bot": "npx tsx telegram/bot.ts",
+    "build": "cd web && npx vite build",
+    "build:web": "cd web && npx vite build",
     "start:prod": "node --loader tsx server/index.ts",
-    "start": "tsx server/index.ts"
+    "start": "npx tsx server/index.ts"
   },
   "dependencies": {
     "@solana/web3.js": "^1.95.3",
+    "@vitejs/plugin-react": "^4.3.3",
     "concurrently": "^9.0.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
@@ -22,6 +23,8 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "telegraf": "^4.16.3",
+    "tsx": "^4.19.2",
+    "vite": "^5.4.10",
     "zod": "^3.23.8"
   },
   "devDependencies": {
@@ -31,9 +34,6 @@
     "@types/node-fetch": "^2.6.13",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
-    "@vitejs/plugin-react": "^4.3.3",
-    "tsx": "^4.19.2",
-    "typescript": "^5.6.3",
-    "vite": "^5.4.10"
+    "typescript": "^5.6.3"
   }
 }
