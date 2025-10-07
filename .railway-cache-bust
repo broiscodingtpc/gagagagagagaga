@@ -1,4 +1,4 @@
 # Railway cache bust file
 # This file forces Railway to clear cache and rebuild
-# Updated: 2025-01-08 - VERBOSE BUILD LOGS
-# Cache ID: verbose-build-$(date +%s)
+# Updated: 2025-01-08 - MANUAL BUILD SCRIPT
+# Cache ID: manual-build-$(date +%s)
