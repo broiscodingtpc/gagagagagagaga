@@ -1,4 +1,4 @@
 # Railway cache bust file
 # This file forces Railway to clear cache and rebuild
-# Updated: 2025-01-08 - MANUAL BUILD SCRIPT
-# Cache ID: manual-build-$(date +%s)
+# Updated: 2025-01-08 - FULL REACT APP BUILD
+# Cache ID: full-react-app-$(date +%s)
