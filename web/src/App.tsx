@@ -9,7 +9,7 @@ import "./styles.css";
 import "./interface/styles.css";
 
 export default function App(){
-  // Professional UI v1.2.0 - High-end, mobile-optimized, clean files
+  // Professional UI v1.3.0 - High-end, mobile-optimized, clean files - FORCE VISIBLE
   const [whitepaperOpen, setWhitepaperOpen] = useState(false);
   const [adminOpen, setAdminOpen] = useState(false);
   const { state: controlState } = useMnexControl();
@@ -30,6 +30,23 @@ export default function App(){
     <div className="professional-app">
       {/* Professional Background */}
       <div className="app-background" />
+      
+      {/* Version Indicator - FORCE VISIBLE */}
+      <div style={{
+        position: 'fixed',
+        top: '10px',
+        left: '10px',
+        background: 'rgba(139, 92, 246, 0.9)',
+        color: 'white',
+        padding: '5px 10px',
+        borderRadius: '4px',
+        fontSize: '12px',
+        fontFamily: 'Courier New, monospace',
+        zIndex: 9999,
+        pointerEvents: 'none'
+      }}>
+        PROFESSIONAL UI v1.3.0
+      </div>
       
       {/* Enhanced 3D Orb - High-end visual */}
       <SplineOrb 

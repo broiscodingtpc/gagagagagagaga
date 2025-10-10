@@ -148,8 +148,10 @@ export async function postAutonomousTweet(
     return null;
   }
 
+  let tweetText = '';
+  
   try {
-    const tweetText = await generateTweet(context);
+    tweetText = await generateTweet(context);
     console.log('[Twitter] Generated tweet:', tweetText);
 
     // Post the tweet
