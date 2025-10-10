@@ -226,7 +226,9 @@ export default function SplineOrb({
         style={{
           width: "100%",
           height: "100%",
-          display: "block"
+          display: "block",
+          filter: "contrast(1.2) brightness(1.1) saturate(1.3)",
+          background: "transparent"
         }}
       />
       
