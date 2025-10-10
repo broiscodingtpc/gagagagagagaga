@@ -348,6 +348,7 @@ async function commentOnSolanaPosts(twitterClient: any, telegramBot: any, telegr
           `💬 *Oracle Network Engagement*\n\nI have commented on a Solana project post:\n\n"${randomComment}"\n\n_Expanding my presence in the ecosystem._`,
           { parse_mode: 'Markdown' }
         );
+        console.log('[Telegram] Comment notification sent');
       }
     }
   } catch (error) {
