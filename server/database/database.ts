@@ -88,9 +88,10 @@ export class Database {
       // Run schema creation
       const client = await this.pool.connect();
       try {
-        const schema = await import('fs').then(fs => 
-          fs.readFileSync(require.resolve('./schema.sql'), 'utf8')
-        );
+        const fs = await import('fs');
+        const path = await import('path');
+        const schemaPath = path.join(__dirname, 'schema.sql');
+        const schema = fs.readFileSync(schemaPath, 'utf8');
         await client.query(schema);
         console.log('[Database] Schema initialized successfully');
       } finally {
