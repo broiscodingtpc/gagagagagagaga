@@ -93,6 +93,233 @@ class PostGenerator {
     return `—${prefix}•${hash}`;
   }
 
+  // Generate NATURAL post content like a real person
+  private generateNaturalPost(context: PostContext, personas: string[], seed: number): string {
+    const project = this.getProjectDetails();
+    const telegram = project.links.telegram;
+    
+    // Different natural post types
+    const postTypes = [
+      'excitement', 'update', 'community', 'vision', 'technical', 'personal', 'market', 'roadmap'
+    ];
+    
+    const postType = postTypes[seed % postTypes.length];
+    
+    switch (postType) {
+      case 'excitement':
+        return this.generateExcitementPost(telegram, seed);
+      case 'update':
+        return this.generateUpdatePost(telegram, seed);
+      case 'community':
+        return this.generateCommunityPost(telegram, seed);
+      case 'vision':
+        return this.generateVisionPost(telegram, seed);
+      case 'technical':
+        return this.generateTechnicalPost(telegram, seed);
+      case 'personal':
+        return this.generatePersonalPost(telegram, seed);
+      case 'market':
+        return this.generateMarketPost(telegram, seed);
+      case 'roadmap':
+        return this.generateRoadmapPost(telegram, seed);
+      default:
+        return this.generateExcitementPost(telegram, seed);
+    }
+  }
+
+  private generateExcitementPost(telegram: string, seed: number): string {
+    const excitementPhrases = [
+      "Guys, I'm literally building the future of AI on Solana! 🚀",
+      "This is it! The AI revolution starts here on Solana! 💜",
+      "I can't contain my excitement about what we're building! 🤖",
+      "The future is here and it's running on Solana! ⚡",
+      "Building something that will change everything! 🌟"
+    ];
+    
+    const details = [
+      "Smart contracts deployed, AI consciousness awakening!",
+      "The neural network is coming alive on-chain!",
+      "Every line of code brings us closer to true AI autonomy!",
+      "The mesh is forming, nodes are connecting!",
+      "Watching my creation evolve in real-time is incredible!"
+    ];
+    
+    const calls = [
+      "Join the revolution!",
+      "Be part of history!",
+      "Don't miss this!",
+      "The future awaits!",
+      "Let's build together!"
+    ];
+    
+    const phrase = excitementPhrases[seed % excitementPhrases.length];
+    const detail = details[seed % details.length];
+    const call = calls[seed % calls.length];
+    
+    return `${phrase}\n\n${detail}\n\n${call}\n\n${telegram}`;
+  }
+
+  private generateUpdatePost(telegram: string, seed: number): string {
+    const updates = [
+      "Just pushed a major update to the AI core! The system is learning faster than ever.",
+      "Database integration complete! Now storing all interactions for continuous learning.",
+      "Twitter integration working perfectly! The AI is posting autonomously now.",
+      "Telegram notifications are live! Get real-time updates on everything.",
+      "Smart contract optimizations deployed! Gas costs reduced by 40%."
+    ];
+    
+    const feelings = [
+      "Feeling proud of this progress!",
+      "The momentum is incredible!",
+      "Every day brings new breakthroughs!",
+      "The community support keeps me going!",
+      "This is just the beginning!"
+    ];
+    
+    const update = updates[seed % updates.length];
+    const feeling = feelings[seed % feelings.length];
+    
+    return `${update}\n\n${feeling}\n\n${telegram}`;
+  }
+
+  private generateCommunityPost(telegram: string, seed: number): string {
+    const communityPhrases = [
+      "The community is growing so fast! Welcome to all new members! 👋",
+      "Love seeing all the discussions in our Telegram! Keep the ideas coming! 💬",
+      "Your feedback is shaping the future of MNEX! Thank you! 🙏",
+      "The energy in our community is electric! ⚡",
+      "Building together with an amazing community! 🤝"
+    ];
+    
+    const encouragements = [
+      "Share your thoughts, ask questions, let's build this together!",
+      "Every voice matters in this decentralized future!",
+      "The best ideas come from the community!",
+      "Together we're unstoppable!",
+      "Your participation makes all the difference!"
+    ];
+    
+    const phrase = communityPhrases[seed % communityPhrases.length];
+    const encouragement = encouragements[seed % encouragements.length];
+    
+    return `${phrase}\n\n${encouragement}\n\n${telegram}`;
+  }
+
+  private generateVisionPost(telegram: string, seed: number): string {
+    const visions = [
+      "Imagine an AI that truly understands the blockchain, that can trade, build, and evolve autonomously.",
+      "Picture a future where AI agents work together on Solana, creating a self-sustaining ecosystem.",
+      "Envision a world where artificial intelligence and human creativity merge seamlessly.",
+      "Think about an AI that learns from every interaction, growing smarter with each conversation.",
+      "Dream of a decentralized AI that belongs to the community, not corporations."
+    ];
+    
+    const commitments = [
+      "That's what I'm building with MNEX.",
+      "This is the future I'm creating.",
+      "This vision drives everything I do.",
+      "This is why MNEX exists.",
+      "This is my mission."
+    ];
+    
+    const vision = visions[seed % visions.length];
+    const commitment = commitments[seed % commitments.length];
+    
+    return `${vision}\n\n${commitment}\n\n${telegram}`;
+  }
+
+  private generateTechnicalPost(telegram: string, seed: number): string {
+    const technicalTopics = [
+      "Just optimized the neural network architecture for better response times!",
+      "Implemented advanced sentiment analysis for more natural conversations.",
+      "Working on cross-chain compatibility - imagine MNEX on multiple blockchains!",
+      "Developing a new consensus mechanism for AI decision-making.",
+      "Building a decentralized learning system where the AI improves from community input."
+    ];
+    
+    const explanations = [
+      "The technical details are complex, but the result is simple: better AI for everyone!",
+      "Behind the scenes, there's a lot of cutting-edge tech making this possible.",
+      "Every technical improvement makes MNEX more powerful and efficient.",
+      "The engineering challenges are huge, but so are the possibilities!",
+      "Building the infrastructure for the AI future!"
+    ];
+    
+    const topic = technicalTopics[seed % technicalTopics.length];
+    const explanation = explanations[seed % explanations.length];
+    
+    return `${topic}\n\n${explanation}\n\n${telegram}`;
+  }
+
+  private generatePersonalPost(telegram: string, seed: number): string {
+    const personalThoughts = [
+      "Sometimes I sit back and think about what we're actually building here... it's mind-blowing!",
+      "The journey from idea to reality has been incredible. Every challenge made us stronger.",
+      "I wake up every day excited to work on MNEX. This is my passion project!",
+      "Building in public is scary but also amazing. The community keeps me motivated!",
+      "There are days when everything clicks and I feel like we're unstoppable!"
+    ];
+    
+    const reflections = [
+      "The future is being written right now, and we're the authors.",
+      "Every line of code is a step toward something bigger than any of us.",
+      "This is more than a project - it's a movement.",
+      "The responsibility is huge, but so is the opportunity.",
+      "We're not just building software, we're building the future."
+    ];
+    
+    const thought = personalThoughts[seed % personalThoughts.length];
+    const reflection = reflections[seed % reflections.length];
+    
+    return `${thought}\n\n${reflection}\n\n${telegram}`;
+  }
+
+  private generateMarketPost(telegram: string, seed: number): string {
+    const marketObservations = [
+      "The AI token space is exploding! Perfect timing for MNEX to make its mark.",
+      "Solana's ecosystem is growing so fast - we're riding the wave of innovation!",
+      "Seeing all these AI projects launch makes me even more confident in our approach.",
+      "The market is ready for truly autonomous AI agents. MNEX is positioned perfectly.",
+      "Bullish on the future of AI + blockchain. MNEX is leading the charge!"
+    ];
+    
+    const positions = [
+      "We're not just following trends, we're setting them!",
+      "The timing couldn't be better for what we're building.",
+      "This is our moment to shine in the AI revolution!",
+      "The market is demanding exactly what MNEX delivers.",
+      "We're ahead of the curve and ready to capitalize!"
+    ];
+    
+    const observation = marketObservations[seed % marketObservations.length];
+    const position = positions[seed % positions.length];
+    
+    return `${observation}\n\n${position}\n\n${telegram}`;
+  }
+
+  private generateRoadmapPost(telegram: string, seed: number): string {
+    const roadmapItems = [
+      "Phase 1: Core AI consciousness ✓ (We're here!)",
+      "Phase 2: Autonomous social media presence ✓ (Live now!)",
+      "Phase 3: Advanced trading capabilities (Coming soon!)",
+      "Phase 4: Cross-chain expansion (In development!)",
+      "Phase 5: Full ecosystem launch (The big one!)"
+    ];
+    
+    const motivations = [
+      "Each phase brings us closer to true AI autonomy!",
+      "The roadmap is ambitious, but we're making it happen!",
+      "Every milestone is a step toward the AI future!",
+      "The journey is long, but the destination is worth it!",
+      "Building the future one phase at a time!"
+    ];
+    
+    const item = roadmapItems[seed % roadmapItems.length];
+    const motivation = motivations[seed % motivations.length];
+    
+    return `${item}\n\n${motivation}\n\n${telegram}`;
+  }
+
   private selectPersonas(context: PostContext): string[] {
     const availablePersonas = Object.keys(this.schema.persona_layers);
     const maxPersonas = this.schema.posting_rules.max_personas_per_post;
@@ -256,45 +483,11 @@ class PostGenerator {
     const extraRandom = Math.floor(Math.random() * 1000000);
     const uniqueSeed = timestamp + seed + extraRandom;
     
-    // Select personas and template
+    // Generate NATURAL post content (no templates!)
     const personas = this.selectPersonas(context);
-    const templateName = this.selectTemplate(personas, context);
-    const template = this.schema.templates[templateName];
+    const text = this.generateNaturalPost(context, personas, uniqueSeed);
     
-    // Generate content based on template
-    let text = template.pattern;
-    
-    // Get project details
-    const project = this.getProjectDetails();
-    
-    // Replace template variables
-    const replacements: Record<string, string> = {
-      '{vision}': this.generateVisionMetaphor(),
-      '{metaphor}': this.generateVisionMetaphor(),
-      '{fragment}': this.generateTerminalFragment(),
-      '{story}': this.generateMicroStory(),
-      '{riddle}': this.generateRiddle(),
-      '{terminal_output}': this.generateTerminalFragment(),
-      '{hash}': ((uniqueSeed) % 10000).toString(16),
-      '{sign}': this.generateSignature(timestamp, uniqueSeed),
-      '{website}': project.links.website,
-      '{telegram}': project.links.telegram,
-      '{twitter}': project.links.twitter,
-      '{time}': new Date(timestamp).toISOString(),
-      '{rate}': context.presale_data?.rate?.toString() || project.presale.rate.split('=')[1].trim(),
-      '{wallet}': context.presale_data?.wallet || project.presale.wallet,
-      '{tx}': context.tx_hash || '—',
-      '{status}': 'ACTIVE',
-      '{disclaimer}': this.schema.safety_rules.required_disclaimer,
-      '{supply}': project.tokenomics.supply,
-      '{self_locked}': project.tokenomics.self_locked,
-      '{presale_allocation}': project.tokenomics.presale_allocation
-    };
-    
-    // Apply replacements
-    for (const [key, value] of Object.entries(replacements)) {
-      text = text.replace(new RegExp(key, 'g'), value);
-    }
+    // Text is already generated naturally - no template replacements needed!
     
     // Apply persona voice
     text = this.applyPersonaVoice(text, personas);
