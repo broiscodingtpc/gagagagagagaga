@@ -13,6 +13,7 @@ import { startAutonomousPosting, postAutonomousTweet, TWITTER_ENABLED } from "./
 import { MnexSocialIntegration } from "./social/integration";
 import { Database } from "./database/database";
 import { AutonomousAI } from "./social/autonomous-ai";
+import { AutonomousScheduler } from "./ai_core/autonomy/scheduler";
 
 const app = express();
 app.use(cors());
@@ -65,6 +66,7 @@ try {
 
 // Autonomous AI
 let autonomousAI: AutonomousAI | null = null;
+let autonomousScheduler: AutonomousScheduler | null = null;
 
 async function notifyTelegram(userMessage: string, mnexReply: string) {
   if (!telegramBot || !CHANNEL_ID) return;
@@ -359,6 +361,42 @@ app.get("/api/health", (req, res) => {
   });
 });
 
+// Learning status endpoint
+app.get("/api/learning/status", async (req, res) => {
+  try {
+    if (!database) {
+      return res.status(503).json({ error: "Database not available" });
+    }
+
+    // Get recent lessons
+    const recentLessons = await database.getRecentLessons(10);
+    const latestEvolution = await database.getLatestEvolution();
+    
+    // Calculate basic stats
+    const totalLessons = recentLessons.length;
+    const topics = [...new Set(recentLessons.map(l => l.topic))];
+    const averageEngagement = totalLessons > 0 
+      ? recentLessons.reduce((sum, l) => sum + l.engagement_score, 0) / totalLessons 
+      : 0;
+
+    res.json({
+      status: "active",
+      learning: {
+        totalLessons,
+        recentLessons: recentLessons.slice(0, 5),
+        topics,
+        averageEngagement: Math.round(averageEngagement),
+        latestEvolution,
+        isLearning: true // Could be enhanced with real-time learning detection
+      },
+      timestamp: new Date().toISOString()
+    });
+  } catch (err) {
+    console.error("[Learning API] Error:", err);
+    res.status(500).json({ error: "Failed to get learning status" });
+  }
+});
+
 // Database endpoints
 app.get("/api/posts", async (req, res) => {
   try {
@@ -404,6 +442,58 @@ app.post("/api/autonomous/start", (req, res) => {
   }
 });
 
+// v2.5 Autonomous Scheduler control
+app.get("/api/autonomous/status", (req, res) => {
+  try {
+    if (!autonomousScheduler) {
+      return res.status(503).json({ error: "Autonomous Scheduler not available" });
+    }
+    
+    const status = autonomousScheduler.getStatus();
+    res.json({ success: true, status });
+  } catch (err) {
+    console.error("[Autonomous API] Error:", err);
+    res.status(500).json({ error: "Failed to get autonomous status" });
+  }
+});
+
+app.post("/api/autonomous/force-learning", async (req, res) => {
+  try {
+    if (!autonomousScheduler) {
+      return res.status(503).json({ error: "Autonomous Scheduler not available" });
+    }
+    
+    await autonomousScheduler.forceLearningCycle();
+    res.json({ success: true, message: "Forced learning cycle initiated" });
+  } catch (err) {
+    console.error("[Autonomous API] Error:", err);
+    res.status(500).json({ error: "Failed to force learning cycle" });
+  }
+});
+
+app.post("/api/autonomous/force-report", async (req, res) => {
+  try {
+    if (!autonomousScheduler) {
+      return res.status(503).json({ error: "Autonomous Scheduler not available" });
+    }
+    
+    await autonomousScheduler.forceDailyReport();
+    res.json({ success: true, message: "Forced daily report initiated" });
+  } catch (err) {
+    console.error("[Autonomous API] Error:", err);
+    res.status(500).json({ error: "Failed to force daily report" });
+  }
+});
+
+// Whitepaper route
+app.get("/whitepaper", (req, res) => {
+  if (process.env.NODE_ENV === 'production') {
+    res.sendFile(path.join(__dirname, '../web/dist/index.html'));
+  } else {
+    res.sendFile(path.join(__dirname, '../web/index.html'));
+  }
+});
+
 // Serve frontend for all other routes (SPA)
 if (process.env.NODE_ENV === 'production') {
   app.get('*', (req, res) => {
@@ -445,9 +535,18 @@ app.listen(port, async () => {
   try {
     autonomousAI = new AutonomousAI(database);
     autonomousAI.startAutonomousMode();
-    console.log("[MNEX] Autonomous AI initialized and started");
+    console.log("[MNEX] Legacy Autonomous AI initialized and started");
   } catch (e) {
-    console.warn("[MNEX] Autonomous AI init failed:", e);
+    console.warn("[MNEX] Legacy Autonomous AI init failed:", e);
+  }
+
+  // Initialize new v2.5 Autonomous Scheduler
+  try {
+    autonomousScheduler = new AutonomousScheduler(database, telegramBot, CHANNEL_ID);
+    autonomousScheduler.start();
+    console.log("[MNEX] v2.5 Autonomous Scheduler initialized and started");
+  } catch (e) {
+    console.warn("[MNEX] v2.5 Autonomous Scheduler init failed:", e);
   }
 });
 

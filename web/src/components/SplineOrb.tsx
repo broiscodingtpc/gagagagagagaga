@@ -6,6 +6,7 @@ interface Props {
   speaking?: boolean;
   thinking?: boolean;
   emotion?: 'calm' | 'alert' | 'intense';
+  learning?: boolean;
   style?: React.CSSProperties;
 }
 
@@ -15,6 +16,7 @@ export default function SplineOrb({
   speaking = false,
   thinking = false,
   emotion = 'calm',
+  learning = false,
   style 
 }: Props) {
   const viewerRef = useRef<any>(null);
@@ -55,8 +57,15 @@ export default function SplineOrb({
       
       // Emotion state
       viewer.setAttribute('emotion', emotion);
+      
+      // Learning state
+      if (learning) {
+        viewer.setAttribute('learning', 'true');
+      } else {
+        viewer.removeAttribute('learning');
+      }
     }
-  }, [energy, visible, speaking, thinking, emotion]);
+  }, [energy, visible, speaking, thinking, emotion, learning]);
 
   useEffect(() => {
     // Continuous pulse effect
@@ -101,6 +110,13 @@ export default function SplineOrb({
             break;
           case 'emotion':
             viewer.setAttribute('emotion', value);
+            break;
+          case 'learning':
+            if (value) {
+              viewer.setAttribute('learning', 'true');
+            } else {
+              viewer.removeAttribute('learning');
+            }
             break;
         }
       }

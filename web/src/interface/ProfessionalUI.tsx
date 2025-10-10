@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 interface ProfessionalUIProps {
   onWhitepaperClick: () => void;
@@ -22,9 +23,16 @@ export function ProfessionalUI({ onWhitepaperClick, onAdminClick }: Professional
       external: true
     },
     {
+      id: 'dexscreener',
+      label: 'Dexscreener',
+      href: '#',
+      external: false,
+      placeholder: true
+    },
+    {
       id: 'whitepaper',
       label: 'Whitepaper',
-      onClick: onWhitepaperClick,
+      href: '/whitepaper',
       external: false
     },
     {
@@ -38,7 +46,10 @@ export function ProfessionalUI({ onWhitepaperClick, onAdminClick }: Professional
   const handleItemClick = (item: any) => {
     if (item.onClick) {
       item.onClick();
-    } else if (item.href) {
+    } else if (item.placeholder) {
+      // Show placeholder message for Dexscreener
+      alert('Dexscreener coming soon! Token not yet live.');
+    } else if (item.href && item.external) {
       window.open(item.href, '_blank', 'noopener,noreferrer');
     }
     setIsMenuOpen(false);
@@ -56,16 +67,31 @@ export function ProfessionalUI({ onWhitepaperClick, onAdminClick }: Professional
           </div>
           
           <div className="nav-links">
-            {navigationItems.map((item) => (
-              <button
-                key={item.id}
-                onClick={() => handleItemClick(item)}
-                className="nav-link"
-              >
-                {item.label}
-                {item.external && <span className="external-icon">↗</span>}
-              </button>
-            ))}
+            {navigationItems.map((item) => {
+              if (item.href && !item.external && !item.placeholder) {
+                return (
+                  <Link
+                    key={item.id}
+                    to={item.href}
+                    className="nav-link"
+                  >
+                    {item.label}
+                  </Link>
+                );
+              } else {
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => handleItemClick(item)}
+                    className="nav-link"
+                  >
+                    {item.label}
+                    {item.external && <span className="external-icon">↗</span>}
+                    {item.placeholder && <span className="placeholder-icon">#</span>}
+                  </button>
+                );
+              }
+            })}
           </div>
         </div>
 
@@ -92,16 +118,31 @@ export function ProfessionalUI({ onWhitepaperClick, onAdminClick }: Professional
         {isMenuOpen && (
           <div className="mobile-menu">
             <div className="mobile-menu-content">
-              {navigationItems.map((item) => (
-                <button
-                  key={item.id}
-                  onClick={() => handleItemClick(item)}
-                  className="mobile-nav-link"
-                >
-                  {item.label}
-                  {item.external && <span className="external-icon">↗</span>}
-                </button>
-              ))}
+              {navigationItems.map((item) => {
+                if (item.href && !item.external && !item.placeholder) {
+                  return (
+                    <Link
+                      key={item.id}
+                      to={item.href}
+                      className="mobile-nav-link"
+                    >
+                      {item.label}
+                    </Link>
+                  );
+                } else {
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => handleItemClick(item)}
+                      className="mobile-nav-link"
+                    >
+                      {item.label}
+                      {item.external && <span className="external-icon">↗</span>}
+                      {item.placeholder && <span className="placeholder-icon">#</span>}
+                    </button>
+                  );
+                }
+              })}
             </div>
           </div>
         )}
@@ -203,6 +244,12 @@ export function ProfessionalUI({ onWhitepaperClick, onAdminClick }: Professional
         .external-icon {
           font-size: 0.8rem;
           opacity: 0.7;
+        }
+
+        .placeholder-icon {
+          font-size: 0.8rem;
+          opacity: 0.5;
+          color: #6b7280;
         }
 
         .status-bar {

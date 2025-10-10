@@ -61,6 +61,25 @@ export interface PresaleTransaction {
   verified_at?: Date;
 }
 
+export interface Lesson {
+  id: number;
+  topic: string;
+  lesson_source: string;
+  summary: string;
+  proof_reference: string;
+  engagement_score: number;
+  created_at: Date;
+}
+
+export interface Evolution {
+  id: number;
+  cycle_number: number;
+  tone_adjustments: any;
+  engagement_analysis: any;
+  maturity_level: number;
+  created_at: Date;
+}
+
 export class Database {
   private pool: Pool;
 
@@ -348,6 +367,123 @@ export class Database {
     }
   }
 
+  // Lessons operations
+  async createLesson(lesson: Omit<Lesson, 'id' | 'created_at'>): Promise<Lesson> {
+    const client = await this.pool.connect();
+    try {
+      const result = await client.query(`
+        INSERT INTO lessons (topic, lesson_source, summary, proof_reference, engagement_score)
+        VALUES ($1, $2, $3, $4, $5)
+        RETURNING *
+      `, [
+        lesson.topic,
+        lesson.lesson_source,
+        lesson.summary,
+        lesson.proof_reference,
+        lesson.engagement_score
+      ]);
+      
+      return this.mapRowToLesson(result.rows[0]);
+    } finally {
+      client.release();
+    }
+  }
+
+  async getRecentLessons(limit: number = 20): Promise<Lesson[]> {
+    const client = await this.pool.connect();
+    try {
+      const result = await client.query(`
+        SELECT * FROM lessons 
+        ORDER BY created_at DESC 
+        LIMIT $1
+      `, [limit]);
+      
+      return result.rows.map(row => this.mapRowToLesson(row));
+    } finally {
+      client.release();
+    }
+  }
+
+  async getLessonsByTopic(topic: string, limit: number = 10): Promise<Lesson[]> {
+    const client = await this.pool.connect();
+    try {
+      const result = await client.query(`
+        SELECT * FROM lessons 
+        WHERE topic = $1
+        ORDER BY created_at DESC 
+        LIMIT $2
+      `, [topic, limit]);
+      
+      return result.rows.map(row => this.mapRowToLesson(row));
+    } finally {
+      client.release();
+    }
+  }
+
+  async updateLessonEngagement(lessonId: number, engagementScore: number): Promise<void> {
+    const client = await this.pool.connect();
+    try {
+      await client.query(`
+        UPDATE lessons 
+        SET engagement_score = $2
+        WHERE id = $1
+      `, [lessonId, engagementScore]);
+    } finally {
+      client.release();
+    }
+  }
+
+  // Evolution operations
+  async createEvolution(evolution: Omit<Evolution, 'id' | 'created_at'>): Promise<Evolution> {
+    const client = await this.pool.connect();
+    try {
+      const result = await client.query(`
+        INSERT INTO evolution (cycle_number, tone_adjustments, engagement_analysis, maturity_level)
+        VALUES ($1, $2, $3, $4)
+        RETURNING *
+      `, [
+        evolution.cycle_number,
+        JSON.stringify(evolution.tone_adjustments),
+        JSON.stringify(evolution.engagement_analysis),
+        evolution.maturity_level
+      ]);
+      
+      return this.mapRowToEvolution(result.rows[0]);
+    } finally {
+      client.release();
+    }
+  }
+
+  async getLatestEvolution(): Promise<Evolution | null> {
+    const client = await this.pool.connect();
+    try {
+      const result = await client.query(`
+        SELECT * FROM evolution 
+        ORDER BY created_at DESC 
+        LIMIT 1
+      `);
+      
+      return result.rows.length > 0 ? this.mapRowToEvolution(result.rows[0]) : null;
+    } finally {
+      client.release();
+    }
+  }
+
+  async getEvolutionHistory(limit: number = 10): Promise<Evolution[]> {
+    const client = await this.pool.connect();
+    try {
+      const result = await client.query(`
+        SELECT * FROM evolution 
+        ORDER BY created_at DESC 
+        LIMIT $1
+      `, [limit]);
+      
+      return result.rows.map(row => this.mapRowToEvolution(row));
+    } finally {
+      client.release();
+    }
+  }
+
   // Helper methods to map database rows to objects
   private mapRowToPost(row: any): Post {
     return {
@@ -417,6 +553,29 @@ export class Database {
       verified: row.verified,
       created_at: row.created_at,
       verified_at: row.verified_at
+    };
+  }
+
+  private mapRowToLesson(row: any): Lesson {
+    return {
+      id: row.id,
+      topic: row.topic,
+      lesson_source: row.lesson_source,
+      summary: row.summary,
+      proof_reference: row.proof_reference,
+      engagement_score: row.engagement_score,
+      created_at: row.created_at
+    };
+  }
+
+  private mapRowToEvolution(row: any): Evolution {
+    return {
+      id: row.id,
+      cycle_number: row.cycle_number,
+      tone_adjustments: row.tone_adjustments,
+      engagement_analysis: row.engagement_analysis,
+      maturity_level: row.maturity_level,
+      created_at: row.created_at
     };
   }
 

@@ -106,6 +106,32 @@ CREATE INDEX IF NOT EXISTS idx_market_data_type ON market_data(data_type);
 CREATE INDEX IF NOT EXISTS idx_user_interactions_user ON user_interactions(user_id);
 CREATE INDEX IF NOT EXISTS idx_presale_tx_hash ON presale_transactions(transaction_hash);
 
+-- Lessons learned from Twitter/web
+CREATE TABLE IF NOT EXISTS lessons (
+    id SERIAL PRIMARY KEY,
+    topic VARCHAR(100),
+    lesson_source TEXT, -- URL or tweet ID
+    summary TEXT,
+    proof_reference VARCHAR(50), -- #ProofMNEX-timestamp
+    engagement_score INTEGER DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Evolution tracking (self-reflection)
+CREATE TABLE IF NOT EXISTS evolution (
+    id SERIAL PRIMARY KEY,
+    cycle_number INTEGER,
+    tone_adjustments JSONB,
+    engagement_analysis JSONB,
+    maturity_level INTEGER,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Indexes for new tables
+CREATE INDEX IF NOT EXISTS idx_lessons_topic ON lessons(topic);
+CREATE INDEX IF NOT EXISTS idx_lessons_created_at ON lessons(created_at);
+CREATE INDEX IF NOT EXISTS idx_evolution_cycle ON evolution(cycle_number);
+
 -- Insert default system configuration
 INSERT INTO system_config (config_key, config_value) VALUES
 ('autonomous_posting_enabled', 'true'),
