@@ -601,14 +601,14 @@ class PostGenerator {
     
     // Generate image prompt if needed
     let imagePrompt: string | undefined;
-    if (templateName === 'vision' && Math.random() > 0.7) {
+    if (context.event_type === 'vision' && Math.random() > 0.7) {
       imagePrompt = "glitch-core neon owl, circuit-feathers, solana code filaments, dark purple, high-contrast – style: glitch-core, aspect:1:1";
     }
     
     return {
       text,
       personas_used: personas,
-      template_used: templateName,
+      template_used: 'natural',
       seed,
       metadata: {
         length: text.length,

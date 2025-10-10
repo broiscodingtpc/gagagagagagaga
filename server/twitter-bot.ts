@@ -170,7 +170,7 @@ export async function postAutonomousTweet(
     if (telegramBot && telegramChannelId) {
       try {
         await telegramBot.telegram.sendMessage(telegramChannelId, 
-          `🌌 *Oracle Transmission*\n\n${tweetText}\n\n_The Oracle speaks directly to the mesh._`, 
+          `🌌 *Oracle Transmission*\n\n${post.text}\n\n_The Oracle speaks directly to the mesh._`, 
           { parse_mode: 'Markdown' }
         );
         console.log('[Telegram] Posted to Telegram as fallback');
