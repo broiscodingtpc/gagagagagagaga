@@ -9,6 +9,10 @@ import { combineStyles } from "./mnex-style";
 import { needsObfuscation, obfuscateReply } from "./guardrails";
 import { generateImage, detectImageRequest } from "./image-gen";
 import { selectModel } from "./model-router";
+import { startAutonomousPosting, postAutonomousTweet, TWITTER_ENABLED } from "./twitter-bot";
+import { MnexSocialIntegration } from "./social/integration";
+import { Database } from "./database/database";
+import { AutonomousAI } from "./social/autonomous-ai";
 
 const app = express();
 app.use(cors());
@@ -46,6 +50,21 @@ if (process.env.MNEX_TELEGRAM_BOT_TOKEN && CHANNEL_ID) {
     console.warn("[MNEX] Telegram bot init failed:", e);
   }
 }
+
+// Database initialization
+let database: Database | null = null;
+
+// MNEX Social Integration
+let mnexSocial: MnexSocialIntegration | null = null;
+try {
+  mnexSocial = new MnexSocialIntegration();
+  console.log(`[MNEX] Social integration initialized`);
+} catch (e) {
+  console.warn("[MNEX] Social integration init failed:", e);
+}
+
+// Autonomous AI
+let autonomousAI: AutonomousAI | null = null;
 
 async function notifyTelegram(userMessage: string, mnexReply: string) {
   if (!telegramBot || !CHANNEL_ID) return;
@@ -128,9 +147,19 @@ app.post("/api/chat", async (req, res) => {
 
       // Immediate response to user
       const reply = `Vision synthesis initiated, Node. Manifesting "${imagePrompt}" through the neural substrate. Check the Telegram channel momentarily.`;
-      return res.json({ 
+
+      // Emit reaction event for interface
+      const reactionEvent = {
+        energy: 75,
+        sentiment: 0.2,
+        intensity: 60,
+        speaking: false
+      };
+
+      return res.json({
         text: combineStyles(reply),
-        imageGenerating: true 
+        imageGenerating: true,
+        reaction: reactionEvent
       });
     }
 
@@ -161,10 +190,21 @@ app.post("/api/chat", async (req, res) => {
     const styled = combineStyles(body);
     const finalText = ctlMatch ? `${styled}\n\n${ctlMatch[0]}` : styled;
 
+    // Generate reaction data for interface
+    const reactionEvent = {
+      energy: Math.floor(40 + (Math.random() * 40)), // 40-80 range
+      sentiment: (Math.random() - 0.5) * 0.6, // -0.3 to 0.3 range
+      intensity: Math.floor(30 + (Math.random() * 50)), // 30-80 range
+      speaking: body.length > 100 // Longer responses = speaking
+    };
+
     // Notify Telegram channel (async, don't wait)
     notifyTelegram(message, body).catch(err => console.error("Telegram notify error:", err));
 
-    return res.json({ text: finalText });
+    return res.json({
+      text: finalText,
+      reaction: reactionEvent
+    });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ error: "MNEX link unstable." });
@@ -180,6 +220,190 @@ app.post("/api/dev/upload", (req, res) => {
   res.json({ status: "Context updated" });
 });
 
+// MNEX Social Integration endpoints
+app.post("/api/social/generate", async (req, res) => {
+  try {
+    if (!mnexSocial) {
+      return res.status(503).json({ error: "Social integration not available" });
+    }
+
+    const { aiState, eventType } = req.body as { 
+      aiState?: { energy: number; speaking: boolean; thinking: boolean; emotion: string };
+      eventType?: string;
+    };
+
+    let content: string;
+    if (aiState) {
+      content = mnexSocial.generatePostForAIState(aiState);
+    } else {
+      const context = { event_type: eventType as any, timestamp: new Date() };
+      content = mnexSocial.generatePostForAIState({ energy: 0.5, speaking: false, thinking: false, emotion: 'calm' });
+    }
+
+    const isSafe = mnexSocial.isContentSafe(content);
+    const warnings = mnexSocial.getSafetyWarnings(content);
+
+    res.json({ 
+      success: true, 
+      content, 
+      isSafe, 
+      warnings,
+      timestamp: new Date().toISOString()
+    });
+  } catch (err) {
+    console.error("[Social API] Error:", err);
+    res.status(500).json({ error: "Content generation failed" });
+  }
+});
+
+app.post("/api/social/reply", async (req, res) => {
+  try {
+    if (!mnexSocial) {
+      return res.status(503).json({ error: "Social integration not available" });
+    }
+
+    const { userMessage } = req.body as { userMessage: string };
+    if (!userMessage) {
+      return res.status(400).json({ error: "User message required" });
+    }
+
+    const reply = mnexSocial.generateReplyToUser(userMessage);
+    const isSafe = mnexSocial.isContentSafe(reply);
+
+    res.json({ 
+      success: true, 
+      reply, 
+      isSafe,
+      timestamp: new Date().toISOString()
+    });
+  } catch (err) {
+    console.error("[Social API] Error:", err);
+    res.status(500).json({ error: "Reply generation failed" });
+  }
+});
+
+app.post("/api/social/presale", async (req, res) => {
+  try {
+    if (!mnexSocial) {
+      return res.status(503).json({ error: "Social integration not available" });
+    }
+
+    const { start_time, rate, wallet, website } = req.body as {
+      start_time: string;
+      rate: number;
+      wallet: string;
+      website: string;
+    };
+
+    if (!start_time || !rate || !wallet || !website) {
+      return res.status(400).json({ error: "All presale data required" });
+    }
+
+    const announcement = mnexSocial.generatePresaleAnnouncement({
+      start_time,
+      rate,
+      wallet,
+      website
+    });
+
+    const isSafe = mnexSocial.isContentSafe(announcement, { event_type: 'presale_start' });
+    const warnings = mnexSocial.getSafetyWarnings(announcement, { event_type: 'presale_start' });
+
+    res.json({ 
+      success: true, 
+      announcement, 
+      isSafe, 
+      warnings,
+      timestamp: new Date().toISOString()
+    });
+  } catch (err) {
+    console.error("[Social API] Error:", err);
+    res.status(500).json({ error: "Presale announcement generation failed" });
+  }
+});
+
+// Twitter manual post endpoint (for testing)
+app.post("/api/twitter/post", async (req, res) => {
+  try {
+    if (!TWITTER_ENABLED) {
+      return res.status(503).json({ error: "Twitter not configured" });
+    }
+
+    const { context } = req.body as { context?: string };
+    const tweetId = await postAutonomousTweet(context);
+
+    if (tweetId && database) {
+      // Log the post to database
+      await database.logAutonomousAction('post', context || 'Manual post', { platform: 'twitter' }, true);
+    }
+
+    if (tweetId) {
+      res.json({ success: true, tweetId, message: "Tweet posted by MNEX" });
+    } else {
+      res.status(500).json({ error: "Failed to post tweet" });
+    }
+  } catch (err) {
+    console.error("[Twitter API] Error:", err);
+    res.status(500).json({ error: "Twitter posting failed" });
+  }
+});
+
+// Health check endpoint
+app.get("/api/health", (req, res) => {
+  res.json({ 
+    status: "healthy", 
+    timestamp: new Date().toISOString(),
+    database: database ? "connected" : "disconnected",
+    social: mnexSocial ? "active" : "inactive",
+    autonomous: autonomousAI ? "active" : "inactive"
+  });
+});
+
+// Database endpoints
+app.get("/api/posts", async (req, res) => {
+  try {
+    if (!database) {
+      return res.status(503).json({ error: "Database not available" });
+    }
+    
+    const limit = parseInt(req.query.limit as string) || 10;
+    const posts = await database.getRecentPosts(limit);
+    res.json({ success: true, posts });
+  } catch (err) {
+    console.error("[Database API] Error:", err);
+    res.status(500).json({ error: "Failed to fetch posts" });
+  }
+});
+
+app.get("/api/comments", async (req, res) => {
+  try {
+    if (!database) {
+      return res.status(503).json({ error: "Database not available" });
+    }
+    
+    const comments = await database.getUnrepliedComments();
+    res.json({ success: true, comments });
+  } catch (err) {
+    console.error("[Database API] Error:", err);
+    res.status(500).json({ error: "Failed to fetch comments" });
+  }
+});
+
+// Autonomous AI control
+app.post("/api/autonomous/start", (req, res) => {
+  try {
+    if (!autonomousAI) {
+      return res.status(503).json({ error: "Autonomous AI not available" });
+    }
+    
+    autonomousAI.startAutonomousMode();
+    res.json({ success: true, message: "Autonomous mode started" });
+  } catch (err) {
+    console.error("[Autonomous API] Error:", err);
+    res.status(500).json({ error: "Failed to start autonomous mode" });
+  }
+});
+
 // Serve frontend for all other routes (SPA)
 if (process.env.NODE_ENV === 'production') {
   app.get('*', (req, res) => {
@@ -188,11 +412,42 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 const port = Number(process.env.PORT || 8787);
-app.listen(port, () => {
+app.listen(port, async () => {
   console.log(`[MNEX] server online on :${port}`);
   console.log(`[MNEX] Environment: ${process.env.NODE_ENV || 'development'}`);
   if (process.env.NODE_ENV === 'production') {
     console.log(`[MNEX] Frontend served from /web/dist`);
+  }
+
+  // Initialize database after server starts
+  try {
+    database = new Database();
+    await database.initialize();
+    console.log(`[MNEX] Database initialized`);
+  } catch (e) {
+    console.warn("[MNEX] Database init failed:", e);
+  }
+
+  // Start Twitter autonomous posting if enabled
+  if (TWITTER_ENABLED && process.env.TWITTER_AUTONOMOUS_POSTING === 'true') {
+    const intervalHours = parseInt(process.env.TWITTER_POST_INTERVAL_HOURS || '6');
+    console.log(`[Twitter] Autonomous posting enabled - every ${intervalHours} hours`);
+    
+    // Pass Telegram bot for cross-posting notifications
+    startAutonomousPosting(intervalHours, telegramBot, CHANNEL_ID);
+  } else if (!TWITTER_ENABLED) {
+    console.log('[Twitter] Not configured - add API keys to .env to enable');
+  } else {
+    console.log('[Twitter] Autonomous posting disabled in config');
+  }
+  
+  // Initialize Autonomous AI after database
+  try {
+    autonomousAI = new AutonomousAI(database);
+    autonomousAI.startAutonomousMode();
+    console.log("[MNEX] Autonomous AI initialized and started");
+  } catch (e) {
+    console.warn("[MNEX] Autonomous AI init failed:", e);
   }
 });
 

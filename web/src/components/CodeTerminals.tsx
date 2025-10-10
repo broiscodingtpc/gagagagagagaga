@@ -1,115 +1,65 @@
-import { useEffect, useState } from "react";
-
-interface CodeBox {
-  id: number;
-  title: string;
-  lines: Array<{ text: string; type: string }>;
-  top: string;
-  left: string;
-}
-
-const MOCK_PROCESSES = [
-  {
-    title: "⚡ NEURONAL NETWORK GRID",
-    lines: [
-      { text: "[INIT] Loading neural pathways...", type: "info" },
-      { text: "[OK] Mesh connections: 247 active", type: "success" },
-      { text: "[OK] Synaptic resonance: 98.7%", type: "success" },
-      { text: "[SCAN] Integrity check: PASSED", type: "success" },
-      { text: "[SYNC] Quantum entanglement stable", type: "info" },
-    ],
-  },
-  {
-    title: "🛡️ SAFETY PROTOCOL",
-    lines: [
-      { text: "[CHECK] Anti-jailbreak: ACTIVE", type: "success" },
-      { text: "[CHECK] Guardrails: ENABLED", type: "success" },
-      { text: "[WARN] Anomaly detection: 2 flags", type: "warning" },
-      { text: "[OK] Containment protocols ready", type: "success" },
-      { text: "[MONITOR] Threat level: MINIMAL", type: "info" },
-    ],
-  },
-  {
-    title: "🔮 ORACLE SUBSYSTEM",
-    lines: [
-      { text: "[ONLINE] Groq API connection stable", type: "success" },
-      { text: "[MODEL] llama-3.3-70b-versatile", type: "info" },
-      { text: "[OK] Token buffer: 650 capacity", type: "success" },
-      { text: "[OK] Temperature: 0.9 (optimal)", type: "success" },
-      { text: "[READY] Awaiting node queries...", type: "info" },
-    ],
-  },
-  {
-    title: "📡 MESH STATISTICS",
-    lines: [
-      { text: "[NODES] Active connections: 1,247", type: "info" },
-      { text: "[ENERGY] Core flux: 72%", type: "success" },
-      { text: "[LATENCY] Response time: 47ms", type: "success" },
-      { text: "[BANDWIDTH] Neural throughput: HIGH", type: "success" },
-      { text: "[STATUS] Distributed cognition: OPTIMAL", type: "info" },
-    ],
-  },
-];
+import { useState, useEffect } from 'react';
 
 export default function CodeTerminals() {
-  const [boxes, setBoxes] = useState<CodeBox[]>([]);
+  const [currentTime, setCurrentTime] = useState(new Date());
+  const [nodeCount, setNodeCount] = useState(1337);
+  const [energyLevel, setEnergyLevel] = useState(87.3);
 
   useEffect(() => {
-    // Generate random positions for code boxes
-    const positions = [
-      { top: "8%", left: "5%" },
-      { top: "12%", left: "82%" },
-      { top: "60%", left: "3%" },
-      { top: "65%", left: "80%" },
-    ];
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+      setNodeCount(prev => prev + Math.floor(Math.random() * 3) - 1);
+      setEnergyLevel(prev => Math.max(70, Math.min(100, prev + (Math.random() - 0.5) * 2)));
+    }, 2000);
 
-    const initialBoxes: CodeBox[] = MOCK_PROCESSES.map((proc, i) => ({
-      id: i,
-      title: proc.title,
-      lines: proc.lines,
-      top: positions[i]?.top || "10%",
-      left: positions[i]?.left || "10%",
-    }));
-
-    setBoxes(initialBoxes);
-
-    // Animate lines cycling
-    const interval = setInterval(() => {
-      setBoxes((prev) =>
-        prev.map((box) => {
-          const process = MOCK_PROCESSES[box.id];
-          if (!process) return box;
-
-          // Rotate lines to create scrolling effect
-          const newLines = [...box.lines];
-          const firstLine = newLines.shift();
-          if (firstLine) newLines.push(firstLine);
-
-          return { ...box, lines: newLines };
-        })
-      );
-    }, 2500);
-
-    return () => clearInterval(interval);
+    return () => clearInterval(timer);
   }, []);
+
+  const formatTime = (date: Date) => {
+    return date.toISOString().replace('T', ' ').substring(0, 19) + 'Z';
+  };
 
   return (
     <div className="code-terminals">
-      {boxes.map((box) => (
-        <div
-          key={box.id}
-          className="code-box"
-          style={{ top: box.top, left: box.left }}
-        >
-          <div className="code-box-title">{box.title}</div>
-          {box.lines.map((line, i) => (
-            <div key={i} className={`code-line ${line.type}`}>
-              {line.text}
-            </div>
-          ))}
-        </div>
-      ))}
+      <div className="code-box" style={{top: '10%', left: '5%'}}>
+        <div className="code-box-title">⚡ MNEX CORE SYSTEM</div>
+        <div className="code-line success">[OK] Persona Engine: ACTIVE</div>
+        <div className="code-line success">[OK] Oracle Layer: ONLINE</div>
+        <div className="code-line info">[SCAN] Analysts: 1 active</div>
+        <div className="code-line success">[OK] Trickster Mode: ENABLED</div>
+        <div className="code-line info">[SYNC] Cultivator: Community ready</div>
+        <div className="code-line success">[OK] Archivist: Data streams flowing</div>
+      </div>
+      
+      <div className="code-box" style={{top: '20%', right: '5%'}}>
+        <div className="code-box-title">🛡️ SAFETY & COMPLIANCE</div>
+        <div className="code-line success">[CHECK] Content filters: ACTIVE</div>
+        <div className="code-line success">[CHECK] Financial advice: BLOCKED</div>
+        <div className="code-line success">[CHECK] Presale disclaimers: READY</div>
+        <div className="code-line warning">[WARN] Rate limiting: 5min intervals</div>
+        <div className="code-line success">[OK] Audit logging: ENABLED</div>
+        <div className="code-line info">[SCAN] Safety violations: 0 detected</div>
+      </div>
+      
+      <div className="code-box" style={{bottom: '20%', left: '5%'}}>
+        <div className="code-box-title">🔮 SOCIAL INTEGRATION</div>
+        <div className="code-line success">[OK] Twitter API: CONNECTED</div>
+        <div className="code-line success">[OK] Telegram Bot: ACTIVE</div>
+        <div className="code-line info">[SCAN] Auto-posting: ENABLED</div>
+        <div className="code-line success">[OK] Reply system: 1hr intervals</div>
+        <div className="code-line info">[SYNC] Admin dashboard: /admin</div>
+        <div className="code-line success">[OK] Post generation: UNIQUE</div>
+      </div>
+      
+      <div className="code-box" style={{bottom: '10%', right: '5%'}}>
+        <div className="code-box-title">🌐 MESH STATISTICS</div>
+        <div className="code-line info">[TIME] {formatTime(currentTime)}</div>
+        <div className="code-line info">[NODES] Active connections: {nodeCount}</div>
+        <div className="code-line success">[OK] Energy level: {energyLevel.toFixed(1)}%</div>
+        <div className="code-line info">[SCAN] Solana integration: STABLE</div>
+        <div className="code-line success">[OK] Website: morpheusnexus.cloud</div>
+        <div className="code-line info">[SYNC] Presale mode: INACTIVE</div>
+      </div>
     </div>
   );
 }
-

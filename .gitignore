@@ -29,3 +29,20 @@ test-*.js
 
 # Dev context (optional - remove if you want to track it)
 # server/dev-context.txt
+
+# Documentation with sensitive info
+FIX_HUGGINGFACE_KEY.md
+LIVE_CHECKLIST.md
+DEPLOY_RAILWAY.md
+DEPLOYMENT_GUIDE.md
+GET_HF_API_KEY.md
+TROUBLESHOOTING.md
+IMAGE_GENERATION_GUIDE.md
+TELEGRAM_CHANNEL_SETUP.md
+STATUS.md
+GET_TELEGRAM_CHANNEL_ID.md
+
+# Database files
+*.db
+*.sqlite
+audit-log.db
