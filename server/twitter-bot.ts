@@ -213,7 +213,7 @@ export function startAutonomousPosting(
     } catch (error) {
       console.error('[Twitter] Autonomous post failed:', error);
     }
-  }, intervalHours * 60 * 60 * 1000);
+  }, Math.max(intervalHours, 12) * 60 * 60 * 1000); // Minimum 12 hours to avoid rate limits
 
   // Post immediately on startup
   postAutonomousTweet(
