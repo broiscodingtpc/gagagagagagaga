@@ -9,6 +9,7 @@ import "./styles.css";
 import "./interface/styles.css";
 
 export default function App(){
+  // Professional UI v1.1.0 - High-end, mobile-optimized
   const [whitepaperOpen, setWhitepaperOpen] = useState(false);
   const [adminOpen, setAdminOpen] = useState(false);
   const { state: controlState } = useMnexControl();
