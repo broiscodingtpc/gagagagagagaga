@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from 'react';
 
+// Admin credentials - not exposed in public repo
+const ADMIN_USERNAME = 'selenadev';
+const ADMIN_PASSWORD = 'selena202528';
+
 interface PendingPost {
   id: number;
   content: string;
@@ -30,10 +34,14 @@ interface SystemStats {
 }
 
 const AdminDashboard: React.FC = () => {
-  const [auth, setAuth] = useState({ username: '', password: '', authenticated: false });
   const [activeTab, setActiveTab] = useState('overview');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
+  
+  // Authentication states
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [loginForm, setLoginForm] = useState({ username: '', password: '' });
+  const [loginError, setLoginError] = useState<string | null>(null);
   
   // Data states
   const [pendingPosts, setPendingPosts] = useState<PendingPost[]>([]);
@@ -69,13 +77,42 @@ const AdminDashboard: React.FC = () => {
     }
   });
 
+  // Login function
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoginError(null);
+    
+    if (loginForm.username === ADMIN_USERNAME && loginForm.password === ADMIN_PASSWORD) {
+      setIsAuthenticated(true);
+      // Store auth in sessionStorage for persistence
+      sessionStorage.setItem('mnex_admin_auth', 'true');
+    } else {
+      setLoginError('Invalid username or password');
+    }
+  };
+
+  // Check if already authenticated
   useEffect(() => {
-    if (auth.authenticated) {
+    const authStatus = sessionStorage.getItem('mnex_admin_auth');
+    if (authStatus === 'true') {
+      setIsAuthenticated(true);
+    }
+  }, []);
+
+  // Logout function
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    sessionStorage.removeItem('mnex_admin_auth');
+    setLoginForm({ username: '', password: '' });
+  };
+
+  useEffect(() => {
+    if (isAuthenticated) {
       loadData();
       const interval = setInterval(loadData, 30000); // Refresh every 30 seconds
       return () => clearInterval(interval);
     }
-  }, [auth.authenticated]);
+  }, [isAuthenticated]);
 
   const loadData = async () => {
     setLoading(true);
@@ -129,15 +166,6 @@ const AdminDashboard: React.FC = () => {
     }
   };
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (auth.username === 'admin' && auth.password === 'mnex2024') {
-      setAuth({ ...auth, authenticated: true });
-      setMessage('Authenticated successfully');
-    } else {
-      setMessage('Invalid credentials');
-    }
-  };
 
   const generatePost = async (eventType: string) => {
     setLoading(true);
@@ -225,7 +253,7 @@ const AdminDashboard: React.FC = () => {
     }
   };
 
-  if (!auth.authenticated) {
+  if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-900 via-black to-indigo-900 flex items-center justify-center">
         <div className="bg-black/50 backdrop-blur-lg rounded-2xl p-8 border border-purple-500/30 max-w-md w-full">
@@ -233,12 +261,17 @@ const AdminDashboard: React.FC = () => {
             MNEX Admin Portal
           </h1>
           <form onSubmit={handleLogin} className="space-y-4">
+            {loginError && (
+              <div className="bg-red-500/20 border border-red-500/50 rounded-lg p-3 text-red-300 text-sm">
+                {loginError}
+              </div>
+            )}
             <div>
               <label className="block text-purple-300 mb-2">Username</label>
               <input
                 type="text"
-                value={auth.username}
-                onChange={(e) => setAuth({ ...auth, username: e.target.value })}
+                value={loginForm.username}
+                onChange={(e) => setLoginForm({ ...loginForm, username: e.target.value })}
                 className="w-full bg-black/50 border border-purple-500/50 rounded-lg px-4 py-2 text-white focus:border-purple-400 focus:outline-none"
                 placeholder="admin"
               />
@@ -247,8 +280,8 @@ const AdminDashboard: React.FC = () => {
               <label className="block text-purple-300 mb-2">Password</label>
               <input
                 type="password"
-                value={auth.password}
-                onChange={(e) => setAuth({ ...auth, password: e.target.value })}
+                value={loginForm.password}
+                onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })}
                 className="w-full bg-black/50 border border-purple-500/50 rounded-lg px-4 py-2 text-white focus:border-purple-400 focus:outline-none"
                 placeholder="mnex2024"
               />
