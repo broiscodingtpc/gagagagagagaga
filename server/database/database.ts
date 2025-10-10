@@ -65,11 +65,16 @@ export class Database {
   private pool: Pool;
 
   constructor() {
-    // Railway provides DATABASE_URL environment variable
-    const connectionString = process.env.DATABASE_URL || process.env.POSTGRES_URL;
+    // Railway provides multiple ways to connect to PostgreSQL
+    let connectionString = process.env.DATABASE_URL || process.env.POSTGRES_URL;
+    
+    // If no direct connection string, build from Railway variables
+    if (!connectionString && process.env.PGUSER && process.env.POSTGRES_PASSWORD && process.env.RAILWAY_PRIVATE_DOMAIN && process.env.PGDATABASE) {
+      connectionString = `postgresql://${process.env.PGUSER}:${process.env.POSTGRES_PASSWORD}@${process.env.RAILWAY_PRIVATE_DOMAIN}:5432/${process.env.PGDATABASE}`;
+    }
     
     if (!connectionString) {
-      throw new Error('Database connection string not found. Please set DATABASE_URL or POSTGRES_URL');
+      throw new Error('Database connection string not found. Please set DATABASE_URL, POSTGRES_URL, or Railway PostgreSQL variables (PGUSER, POSTGRES_PASSWORD, RAILWAY_PRIVATE_DOMAIN, PGDATABASE)');
     }
 
     this.pool = new Pool({
@@ -81,6 +86,7 @@ export class Database {
     });
 
     console.log('[Database] PostgreSQL connection pool initialized');
+    console.log('[Database] Connection string format:', connectionString.substring(0, 20) + '...');
   }
 
   async initialize(): Promise<void> {
