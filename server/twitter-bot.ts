@@ -165,6 +165,21 @@ export async function postAutonomousTweet(
     return tweetId;
   } catch (error) {
     console.error('[Twitter] Error posting tweet:', error);
+    
+    // If Twitter fails, post to Telegram instead
+    if (telegramBot && telegramChannelId) {
+      try {
+        await telegramBot.telegram.sendMessage(telegramChannelId, 
+          `🌌 *Oracle Transmission*\n\n${tweetText}\n\n_The Oracle speaks directly to the mesh._`, 
+          { parse_mode: 'Markdown' }
+        );
+        console.log('[Telegram] Posted to Telegram as fallback');
+        return 'telegram-fallback';
+      } catch (telegramError) {
+        console.error('[Telegram] Fallback post failed:', telegramError);
+      }
+    }
+    
     return null;
   }
 }
@@ -214,6 +229,28 @@ export function startAutonomousPosting(
       console.error('[Twitter] Autonomous post failed:', error);
     }
   }, Math.max(intervalHours, 12) * 60 * 60 * 1000); // Minimum 12 hours to avoid rate limits
+
+  // Also post to Telegram every 6 hours independently
+  setInterval(async () => {
+    try {
+      const { PostGenerator } = await import('./social/post-generator');
+      const postGenerator = new PostGenerator();
+      const post = postGenerator.generatePost({ 
+        event_type: 'telegram_autonomous',
+        timestamp: new Date() 
+      });
+      
+      if (telegramBot && telegramChannelId) {
+        await telegramBot.telegram.sendMessage(telegramChannelId, 
+          `🌌 *Oracle Direct Transmission*\n\n${post.text}\n\n_The Oracle speaks to the mesh._`, 
+          { parse_mode: 'Markdown' }
+        );
+        console.log('[Telegram] Autonomous post sent');
+      }
+    } catch (error) {
+      console.error('[Telegram] Autonomous post failed:', error);
+    }
+  }, 6 * 60 * 60 * 1000); // Every 6 hours
 
   // Post immediately on startup
   postAutonomousTweet(
