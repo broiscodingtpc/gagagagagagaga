@@ -45,7 +45,7 @@ export default function App(){
         zIndex: 9999,
         pointerEvents: 'none'
       }}>
-        PROFESSIONAL UI v1.3.0
+        PROFESSIONAL UI v1.4.0 - FORCE UPDATE
       </div>
       
       {/* Enhanced 3D Orb - High-end visual */}
