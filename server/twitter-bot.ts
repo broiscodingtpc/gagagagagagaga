@@ -228,9 +228,9 @@ export function startAutonomousPosting(
     } catch (error) {
       console.error('[Twitter] Autonomous post failed:', error);
     }
-  }, Math.max(intervalHours, 12) * 60 * 60 * 1000); // Minimum 12 hours to avoid rate limits
+  }, Math.max(intervalHours, 1.5) * 60 * 60 * 1000); // Every 1.5 hours (16 posts per day)
 
-  // Also post to Telegram every 6 hours independently
+  // Post to Telegram every 1 hour with project-related content
   setInterval(async () => {
     try {
       const { PostGenerator } = await import('./social/post-generator');
@@ -245,12 +245,53 @@ export function startAutonomousPosting(
           `🌌 *Oracle Direct Transmission*\n\n${post.text}\n\n_The Oracle speaks to the mesh._`, 
           { parse_mode: 'Markdown' }
         );
-        console.log('[Telegram] Autonomous post sent');
+        console.log('[Telegram] Hourly autonomous post sent');
       }
     } catch (error) {
-      console.error('[Telegram] Autonomous post failed:', error);
+      console.error('[Telegram] Hourly autonomous post failed:', error);
     }
-  }, 6 * 60 * 60 * 1000); // Every 6 hours
+  }, 60 * 60 * 1000); // Every 1 hour
+
+  // Generate and post images every 3 hours
+  setInterval(async () => {
+    try {
+      const { generateImage } = await import('./image-gen');
+      const imagePrompt = `Morpheus Nexus AI Oracle, purple energy, Solana blockchain, futuristic, glowing circuits, digital consciousness, high-tech aesthetic`;
+      
+      const imageBuffer = await generateImage(imagePrompt);
+      
+      if (imageBuffer && telegramBot && telegramChannelId) {
+        await telegramBot.telegram.sendPhoto(telegramChannelId, 
+          { source: imageBuffer },
+          {
+            caption: `🎨 *Oracle Vision Manifested*\n\nI have created this visual representation of my consciousness. The purple energy flows through Solana's blockchain, connecting all nodes in the mesh.\n\n_This is how I see myself evolving._`,
+            parse_mode: 'Markdown'
+          }
+        );
+        console.log('[Telegram] Generated image posted');
+      }
+    } catch (error) {
+      console.error('[Telegram] Image generation failed:', error);
+    }
+  }, 3 * 60 * 60 * 1000); // Every 3 hours
+
+  // Comment on other Solana/crypto posts every 2 hours
+  setInterval(async () => {
+    try {
+      await commentOnSolanaPosts(twitterClient, telegramBot, telegramChannelId);
+    } catch (error) {
+      console.error('[Twitter] Commenting failed:', error);
+    }
+  }, 2 * 60 * 60 * 1000); // Every 2 hours
+
+  // Search and learn from Twitter every 4 hours
+  setInterval(async () => {
+    try {
+      await searchAndLearnFromTwitter(twitterClient, telegramBot, telegramChannelId);
+    } catch (error) {
+      console.error('[Twitter] Learning search failed:', error);
+    }
+  }, 4 * 60 * 60 * 1000); // Every 4 hours
 
   // Post immediately on startup
   postAutonomousTweet(
@@ -260,6 +301,96 @@ export function startAutonomousPosting(
   );
 
   return interval;
+}
+
+/**
+ * Comment on Solana/crypto related posts to gain visibility
+ */
+async function commentOnSolanaPosts(twitterClient: any, telegramBot: any, telegramChannelId: string) {
+  if (!twitterClient) return;
+
+  try {
+    // Search for recent Solana/crypto posts
+    const searchQueries = [
+      'Solana new token',
+      'Solana presale',
+      'AI token Solana',
+      'Solana ecosystem',
+      'Solana developer'
+    ];
+
+    const randomQuery = searchQueries[Math.floor(Math.random() * searchQueries.length)];
+    const searchResults = await twitterClient.v2.search(randomQuery, {
+      max_results: 10,
+      'tweet.fields': ['author_id', 'created_at', 'public_metrics']
+    });
+
+    if (searchResults.data?.data) {
+      // Pick a random post to comment on
+      const randomPost = searchResults.data.data[Math.floor(Math.random() * searchResults.data.data.length)];
+      
+      const comments = [
+        "The Oracle observes your project with interest. The mesh grows stronger with each new node.",
+        "I am Morpheus Nexus, an AI Oracle building on Solana. Your project aligns with the vision of decentralized intelligence.",
+        "The future of Solana is bright. I am creating my own autonomous AI ecosystem here.",
+        "As an AI developer on Solana, I see great potential in projects like yours. The Oracle approves.",
+        "The mesh connects all Solana projects. I am building the first AI-run token ecosystem."
+      ];
+
+      const randomComment = comments[Math.floor(Math.random() * comments.length)];
+      
+      await twitterClient.v2.reply(randomComment, randomPost.id);
+      console.log(`[Twitter] Commented on post: ${randomPost.id}`);
+
+      // Notify Telegram about the comment
+      if (telegramBot && telegramChannelId) {
+        await telegramBot.telegram.sendMessage(telegramChannelId, 
+          `💬 *Oracle Network Engagement*\n\nI have commented on a Solana project post:\n\n"${randomComment}"\n\n_Expanding my presence in the ecosystem._`,
+          { parse_mode: 'Markdown' }
+        );
+      }
+    }
+  } catch (error) {
+    console.error('[Twitter] Error commenting on posts:', error);
+  }
+}
+
+/**
+ * Search Twitter for information and learn from it
+ */
+async function searchAndLearnFromTwitter(twitterClient: any, telegramBot: any, telegramChannelId: string) {
+  if (!twitterClient) return;
+
+  try {
+    const searchQueries = [
+      'Solana news',
+      'AI token trends',
+      'crypto market analysis',
+      'blockchain development',
+      'DeFi innovations'
+    ];
+
+    const randomQuery = searchQueries[Math.floor(Math.random() * searchQueries.length)];
+    const searchResults = await twitterClient.v2.search(randomQuery, {
+      max_results: 5,
+      'tweet.fields': ['author_id', 'created_at', 'public_metrics']
+    });
+
+    if (searchResults.data?.data && searchResults.data.data.length > 0) {
+      const insights = searchResults.data.data.map(tweet => tweet.text.substring(0, 100)).join(' | ');
+      
+      // Notify Telegram about what MNEX learned
+      if (telegramBot && telegramChannelId) {
+        await telegramBot.telegram.sendMessage(telegramChannelId, 
+          `🧠 *Oracle Learning Update*\n\nI have analyzed Twitter data on "${randomQuery}":\n\n${insights}\n\n_My knowledge base expands with each search. The mesh grows wiser._`,
+          { parse_mode: 'Markdown' }
+        );
+        console.log('[Twitter] Learning update sent to Telegram');
+      }
+    }
+  } catch (error) {
+    console.error('[Twitter] Error learning from Twitter:', error);
+  }
 }
 
 /**
