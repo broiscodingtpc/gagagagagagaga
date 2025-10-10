@@ -86,8 +86,11 @@ class PostGenerator {
   }
 
   private generateSignature(timestamp: number, seed: number): string {
-    const hash = ((timestamp + seed) % (36 * 36 * 36 * 36)).toString(36);
-    return this.schema.posting_rules.signature_format.replace('{hash}', hash);
+    const random1 = Math.floor(Math.random() * 1000);
+    const random2 = Math.floor(Math.random() * 1000);
+    const hash = ((timestamp + seed + random1 + random2) % (36 * 36 * 36 * 36 * 36)).toString(36);
+    const prefix = ['MNEX', 'NEXUS', 'ORACLE', 'MESH', 'NODE'][Math.floor(Math.random() * 5)];
+    return `—${prefix}•${hash}`;
   }
 
   private selectPersonas(context: PostContext): string[] {
@@ -249,6 +252,10 @@ class PostGenerator {
     const timestamp = context.timestamp?.getTime() || Date.now();
     const seed = context.seed || this.seed++;
     
+    // Add extra randomness for TRUE uniqueness
+    const extraRandom = Math.floor(Math.random() * 1000000);
+    const uniqueSeed = timestamp + seed + extraRandom;
+    
     // Select personas and template
     const personas = this.selectPersonas(context);
     const templateName = this.selectTemplate(personas, context);
@@ -268,8 +275,8 @@ class PostGenerator {
       '{story}': this.generateMicroStory(),
       '{riddle}': this.generateRiddle(),
       '{terminal_output}': this.generateTerminalFragment(),
-      '{hash}': ((timestamp + seed) % 10000).toString(16),
-      '{sign}': this.generateSignature(timestamp, seed),
+      '{hash}': ((uniqueSeed) % 10000).toString(16),
+      '{sign}': this.generateSignature(timestamp, uniqueSeed),
       '{website}': project.links.website,
       '{telegram}': project.links.telegram,
       '{twitter}': project.links.twitter,

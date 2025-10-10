@@ -126,7 +126,7 @@
       "personas": ["oracle", "trickster"]
     },
     "announcement": {
-      "pattern": "`PRESALE LIVE — {time} | Rate: 1 SOL = {rate} MNEX | Wallet: {wallet} | Join: {website}\n\ntx: {tx}\nstatus: {status}\n\n{disclaimer}`\n\n{telegram}",
+      "pattern": "`Presale Details — Rate: 1 SOL = {rate} MNEX | Wallet: {wallet} | Join: {website}\n\nStatus: Coming Soon\n\n{disclaimer}`\n\n{telegram}",
       "personas": ["analyst", "archivist"]
     },
     "community": {
