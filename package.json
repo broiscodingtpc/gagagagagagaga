@@ -7,11 +7,11 @@
     "dev:web": "cd web && npx vite",
     "dev:server": "npx tsx server/index.ts",
     "bot": "npx tsx telegram/bot.ts",
-    "build": "chmod +x build.sh && ./build.sh",
-    "build:web": "chmod +x build.sh && ./build.sh",
+    "build": "cd web && npm install && npm run build && cp -r dist ../server/public",
+    "build:web": "cd web && npm install && npm run build && cp -r dist ../server/public",
     "postinstall": "echo 'Dependencies installed successfully'",
-    "start:prod": "node --import tsx server/index.ts",
-    "start": "npx tsx server/index.ts"
+    "start:prod": "npm run build && cd server && node --import tsx index.ts",
+    "start": "npm run build && cd server && npx tsx index.ts"
   },
   "dependencies": {
     "@solana/web3.js": "^1.95.3",

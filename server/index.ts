@@ -19,20 +19,18 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Serve static frontend in production
-if (process.env.NODE_ENV === 'production') {
-  const distPath = path.join(__dirname, '../web/dist');
-  app.use(express.static(distPath));
-  console.log(`[MNEX] Serving static files from ${distPath}`);
-  
-  // Debug: Check if dist directory exists
-  if (fs.existsSync(distPath)) {
-    console.log(`[MNEX] ✅ Dist directory exists: ${distPath}`);
-    const files = fs.readdirSync(distPath);
-    console.log(`[MNEX] Files in dist:`, files);
-  } else {
-    console.log(`[MNEX] ❌ Dist directory NOT found: ${distPath}`);
-  }
+// Serve static frontend from public directory
+const publicPath = path.join(__dirname, 'public');
+app.use(express.static(publicPath));
+console.log(`[MNEX] Serving static files from ${publicPath}`);
+
+// Debug: Check if public directory exists
+if (fs.existsSync(publicPath)) {
+  console.log(`[MNEX] ✅ Public directory exists: ${publicPath}`);
+  const files = fs.readdirSync(publicPath);
+  console.log(`[MNEX] Files in public:`, files);
+} else {
+  console.log(`[MNEX] ❌ Public directory NOT found: ${publicPath}`);
 }
 
 // Dev-controlled learning only
@@ -487,19 +485,13 @@ app.post("/api/autonomous/force-report", async (req, res) => {
 
 // Whitepaper route
 app.get("/whitepaper", (req, res) => {
-  if (process.env.NODE_ENV === 'production') {
-    res.sendFile(path.join(__dirname, '../web/dist/index.html'));
-  } else {
-    res.sendFile(path.join(__dirname, '../web/index.html'));
-  }
+  res.sendFile(path.join(__dirname, 'public/index.html'));
 });
 
 // Serve frontend for all other routes (SPA)
-if (process.env.NODE_ENV === 'production') {
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../web/dist/index.html'));
-  });
-}
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public/index.html'));
+});
 
 const port = Number(process.env.PORT || 8787);
 app.listen(port, async () => {

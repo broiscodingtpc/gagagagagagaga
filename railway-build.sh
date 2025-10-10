@@ -1,11 +1,11 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-echo "🚀 MNEX v2.5 - Build Script"
-echo "==========================="
+echo "🔧 Building MNEX v2.5 Frontend..."
+echo "=================================="
 
 # Check if we're in the right directory
 if [ ! -f "package.json" ]; then
-    echo "❌ package.json not found!"
+    echo "❌ package.json not found! Make sure you're in the project root."
     exit 1
 fi
 
@@ -42,13 +42,9 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-echo "✅ Build completed successfully!"
-echo "📁 Output directory: server/public"
+echo "✅ Build complete!"
+echo "📋 Files in server/public:"
+ls -la server/public/
 
-# Debug: List files in public
-if [ -d "server/public" ]; then
-    echo "📋 Files in server/public:"
-    ls -la server/public/
-else
-    echo "❌ server/public directory not found!"
-fi
+echo ""
+echo "🚀 MNEX v2.5 Frontend ready for deployment!"
