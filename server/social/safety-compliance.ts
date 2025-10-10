@@ -292,6 +292,11 @@ class SafetyCompliance {
     const logContent = this.auditLog.join('\n');
     fs.writeFileSync(filePath, logContent);
   }
+
+  public isContentSafe(content: string, context?: { event_type?: string; presale_mode?: boolean }): boolean {
+    const check = this.checkContent(content, context);
+    return check.passed;
+  }
 }
 
 export { SafetyCompliance, type ComplianceCheck, type SafetyViolation, type SafetyRule };

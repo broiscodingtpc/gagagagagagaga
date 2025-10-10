@@ -65,14 +65,14 @@ export class DecisionBrain {
       const proofRef = `#ProofMNEX-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`;
       
       // Safety check
-      const isSafe = this.safetyCompliance.isContentSafe(content);
-      if (!isSafe) {
+      const safetyCheck = this.safetyCompliance.checkContent(content);
+      if (!safetyCheck.passed) {
         return {
           shouldPost: false,
           topic: chosenTopic,
           content: '',
           proofReference: proofRef,
-          reasoning: 'Content failed safety check'
+          reasoning: `Content failed safety check: ${safetyCheck.violations.map(v => v.rule.description).join(', ')}`
         };
       }
 

@@ -62,8 +62,8 @@ export class TwitterSense {
           const insights = await this.extractInsightsFromTweets(tweets, topic);
           learningResults.push(...insights);
           
-          // Small delay to respect rate limits
-          await new Promise(resolve => setTimeout(resolve, 1000));
+          // Longer delay to respect rate limits (5 seconds between topics)
+          await new Promise(resolve => setTimeout(resolve, 5000));
         } catch (error) {
           console.error(`[TwitterSense] Error collecting tweets for ${topic}:`, error);
         }
@@ -84,7 +84,7 @@ export class TwitterSense {
     try {
       const searchQuery = `${topic} -is:retweet lang:en`;
       const tweets = await this.twitterClient.v2.search(searchQuery, {
-        max_results: 15,
+        max_results: 5, // Reduced from 15 to avoid rate limits
         'tweet.fields': ['created_at', 'author_id', 'public_metrics']
       });
 
@@ -95,8 +95,15 @@ export class TwitterSense {
         created_at: tweet.created_at || new Date().toISOString(),
         url: `https://twitter.com/i/web/status/${tweet.id}`
       })) || [];
-    } catch (error) {
+    } catch (error: any) {
       console.error(`[TwitterSense] Error searching tweets for ${topic}:`, error);
+      
+      // Handle rate limiting specifically
+      if (error.code === 429) {
+        console.log(`[TwitterSense] Rate limited for ${topic}, using web search fallback`);
+        return await this.getWebSearchFallback(topic);
+      }
+      
       return [];
     }
   }
@@ -155,6 +162,30 @@ export class TwitterSense {
     ];
     
     return insights[Math.floor(Math.random() * insights.length)];
+  }
+
+  /**
+   * Get web search fallback for a specific topic
+   */
+  private async getWebSearchFallback(topic: string): Promise<TweetData[]> {
+    try {
+      console.log(`[TwitterSense] Using web search fallback for topic: ${topic}`);
+      
+      // Use existing web search functionality
+      const searchResults = await this.webSearch.searchSolanaNews();
+      
+      // Convert web results to tweet-like format
+      return searchResults.slice(0, 3).map((result, index) => ({
+        id: `web-${topic}-${Date.now()}-${index}`,
+        text: `${result.title} - ${result.snippet}`,
+        author_id: 'web-source',
+        created_at: new Date().toISOString(),
+        url: result.url
+      }));
+    } catch (error) {
+      console.error(`[TwitterSense] Error in web search fallback for ${topic}:`, error);
+      return [];
+    }
   }
 
   /**
