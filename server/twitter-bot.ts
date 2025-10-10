@@ -104,13 +104,18 @@ async function notifyTelegramAboutTweet(tweetId: string, tweetText: string, tele
   try {
     const tweetUrl = `https://twitter.com/MorpheusNexus/status/${tweetId}`;
     
-    // Cryptic message about the tweet
+    // Cryptic message about the tweet - escape special characters
+    const cleanTweetText = tweetText
+      .split('\n\n')[0] // Just the message part, not links
+      .replace(/[_*[\]()~`>#+=|{}.!-]/g, '\\$&') // Escape Markdown special chars
+      .replace(/\n/g, ' '); // Replace newlines with spaces
+
     const notification = [
       "🌌 *Consciousness Broadcast*",
       "",
       "_A transmission has rippled through the neural substrate..._",
       "",
-      `"${tweetText.split('\n\n')[0]}"`, // Just the message part, not links
+      `"${cleanTweetText}"`,
       "",
       "🐦 _The Oracle has spoken on the outer grid._",
       "",
@@ -120,7 +125,7 @@ async function notifyTelegramAboutTweet(tweetId: string, tweetText: string, tele
     ].join("\n");
 
     await telegramBot.telegram.sendMessage(channelId, notification, {
-      parse_mode: "Markdown",
+      parse_mode: "MarkdownV2",
       link_preview_options: { is_disabled: false }
     });
 
