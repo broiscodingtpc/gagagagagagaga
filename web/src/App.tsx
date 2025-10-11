@@ -16,9 +16,7 @@ function HomePage() {
   const { state: controlState } = useMnexControl();
   const learningStatus = useLearningStatus();
 
-  const handleAdminClick = () => {
-    window.location.href = '/admin';
-  };
+  // Admin functionality removed from main page
 
   return (
     <div className="professional-app">
@@ -56,9 +54,7 @@ function HomePage() {
       />
       
       {/* Professional Navigation */}
-      <ProfessionalUI 
-        onAdminClick={handleAdminClick}
-      />
+      <ProfessionalUI />
       
       {/* Professional Chat Interface */}
       <ProfessionalChat />

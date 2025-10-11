@@ -1,11 +1,9 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
-interface ProfessionalUIProps {
-  onAdminClick: () => void;
-}
+interface ProfessionalUIProps {}
 
-export function ProfessionalUI({ onAdminClick }: ProfessionalUIProps) {
+export function ProfessionalUI({}: ProfessionalUIProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const navigationItems = [
@@ -32,12 +30,6 @@ export function ProfessionalUI({ onAdminClick }: ProfessionalUIProps) {
       id: 'whitepaper',
       label: 'Whitepaper',
       href: '/whitepaper',
-      external: false
-    },
-    {
-      id: 'admin',
-      label: 'Admin',
-      onClick: onAdminClick,
       external: false
     }
   ];
