@@ -167,12 +167,17 @@ app.post("/api/chat", async (req, res) => {
     const selectedModel = selectModel(message);
     console.log(`[MNEX] Using model: ${selectedModel.name}`);
     
+    console.log(`[Chat] Processing message: "${message}"`);
+    
     const messages = [
       { role: "system", content: SYSTEM_PROMPT },
       { role: "system", content: buildUserPrimer() },
       ...(DEV_CONTEXT ? [{ role: "system", content: DEV_CONTEXT }] : []),
       { role: "user", content: message }
     ];
+
+    console.log(`[Chat] Using model: ${selectedModel.id}`);
+    console.log(`[Chat] Sending request to Groq...`);
 
     const completion = await groq.chat.completions.create({
       model: selectedModel.id,
@@ -182,13 +187,18 @@ app.post("/api/chat", async (req, res) => {
       stream: false
     } as any);
 
+    console.log(`[Chat] Groq response received`);
+
     const raw = completion.choices?.[0]?.message?.content?.trim() || "Signal degraded.";
+    console.log(`[Chat] Raw response: "${raw}"`);
 
     // Preserve optional control block if present.
     const ctlMatch = raw.match(/```mnexctl[\s\S]*?```/);
     const body = raw.replace(/```mnexctl[\s\S]*?```/, "").trim();
     const styled = combineStyles(body);
     const finalText = ctlMatch ? `${styled}\n\n${ctlMatch[0]}` : styled;
+    
+    console.log(`[Chat] Final response: "${finalText}"`);
 
     // Generate reaction data for interface
     const reactionEvent = {
@@ -206,7 +216,7 @@ app.post("/api/chat", async (req, res) => {
       reaction: reactionEvent
     });
   } catch (err) {
-    console.error(err);
+    console.error(`[Chat] Error processing message:`, err);
     return res.status(500).json({ error: "MNEX link unstable." });
   }
 });
