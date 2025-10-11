@@ -144,6 +144,7 @@ const AdminDashboard: React.FC = () => {
     }
   };
 
+  /*
   const _generatePost = async (eventType: string) => {
     setLoading(true);
     try {
@@ -164,6 +165,7 @@ const AdminDashboard: React.FC = () => {
       setLoading(false);
     }
   };
+  */
 
   const approvePost = async (postId: number) => {
     try {
