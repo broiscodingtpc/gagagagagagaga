@@ -47,26 +47,12 @@ class AutonomousAI {
     return await this.webSearch.searchSolanaNews();
   }
 
-  // Get comments from Twitter posts
+  // Get comments from Twitter posts - DISABLED to avoid rate limits
   private async getTwitterComments(postId: string): Promise<TwitterComment[]> {
-    if (!this.twitterClient) return [];
-    
-    try {
-      const replies = await this.twitterClient.v2.search({
-        query: `conversation_id:${postId}`,
-        max_results: 10
-      });
-      
-      return replies.data?.data?.map(tweet => ({
-        id: tweet.id,
-        text: tweet.text,
-        author: tweet.author_id || 'unknown',
-        timestamp: tweet.created_at || new Date().toISOString()
-      })) || [];
-    } catch (error) {
-      console.error('[AutonomousAI] Error fetching comments:', error);
-      return [];
-    }
+    // Comment checking disabled to prevent Twitter API rate limiting
+    // The new v2.5 scheduler handles interactions more efficiently
+    console.log('[AutonomousAI] Comment checking disabled to avoid rate limits');
+    return [];
   }
 
   // Generate intelligent reply to comment
@@ -211,7 +197,9 @@ class AutonomousAI {
       }
     }
     
-    if (shouldCheckComments && this.twitterClient) {
+    // Comment checking disabled to avoid Twitter rate limits
+    // The new v2.5 scheduler handles all Twitter interactions more efficiently
+    if (false && shouldCheckComments && this.twitterClient) {
       try {
         // Get recent tweets to check for comments
         const recentTweets = await this.twitterClient.v2.userTimeline('me', {
