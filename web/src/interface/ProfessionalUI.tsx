@@ -1,12 +1,11 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 interface ProfessionalUIProps {
-  onWhitepaperClick: () => void;
   onAdminClick: () => void;
 }
 
-export function ProfessionalUI({ onWhitepaperClick, onAdminClick }: ProfessionalUIProps) {
+export function ProfessionalUI({ onAdminClick }: ProfessionalUIProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const navigationItems = [
@@ -165,7 +164,7 @@ export function ProfessionalUI({ onWhitepaperClick, onAdminClick }: Professional
       </div>
 
       {/* Professional Styles */}
-      <style jsx>{`
+        <style>{`
         .professional-nav {
           position: fixed;
           top: 0;

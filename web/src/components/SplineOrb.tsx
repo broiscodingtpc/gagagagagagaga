@@ -145,17 +145,18 @@ export default function SplineOrb({
         ...style,
       }}
     >
-      <spline-viewer 
-        ref={viewerRef}
-        url="https://prod.spline.design/6UFZXPV-2mbsPkuM/scene.splinecode"
-        style={{
-          width: "100%",
-          height: "100%",
-          display: "block",
-          filter: "contrast(1.2) brightness(1.1) saturate(1.3)",
-          background: "transparent"
-        }}
-      />
+        <div
+          ref={viewerRef}
+          data-spline-viewer
+          data-url="https://prod.spline.design/6UFZXPV-2mbsPkuM/scene.splinecode"
+          style={{
+            width: "100%",
+            height: "100%",
+            display: "block",
+            filter: "contrast(1.2) brightness(1.1) saturate(1.3)",
+            background: "transparent"
+          }}
+        />
       
       {/* COMPLETELY HIDE Spline watermark */}
       <style>{`

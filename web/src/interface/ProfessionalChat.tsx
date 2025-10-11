@@ -151,7 +151,7 @@ export function ProfessionalChat({ className = '' }: ProfessionalChatProps) {
       )}
 
       {/* Professional Styles */}
-      <style jsx>{`
+        <style>{`
         .professional-chat {
           position: fixed;
           bottom: 60px;

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import SplineOrb from "./components/SplineOrb";
 import { ProfessionalUI } from "./interface/ProfessionalUI";
@@ -57,7 +57,6 @@ function HomePage() {
       
       {/* Professional Navigation */}
       <ProfessionalUI 
-        onWhitepaperClick={() => setWhitepaperOpen(true)}
         onAdminClick={handleAdminClick}
       />
       
@@ -71,7 +70,7 @@ function HomePage() {
       />
 
       {/* Professional App Styles */}
-      <style jsx>{`
+        <style>{`
         .professional-app {
           position: fixed;
           inset: 0;

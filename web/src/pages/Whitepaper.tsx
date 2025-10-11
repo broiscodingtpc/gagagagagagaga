@@ -1,4 +1,4 @@
-import React from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 export default function Whitepaper() {
@@ -154,7 +154,7 @@ export default function Whitepaper() {
       </div>
 
       {/* Styles */}
-      <style jsx>{`
+        <style>{`
         .whitepaper-page {
           min-height: 100vh;
           background: radial-gradient(circle at 50% 50%, rgba(26, 0, 51, 0.8) 0%, #0a0a0a 70%);

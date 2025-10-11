@@ -1,4 +1,4 @@
-import React from 'react';
+import { useState } from 'react';
 
 interface WhitepaperModalProps {
   isOpen: boolean;
@@ -74,7 +74,7 @@ export function WhitepaperModal({ isOpen, onClose }: WhitepaperModalProps) {
         </div>
       </div>
 
-      <style jsx>{`
+        <style>{`
         .modal-overlay {
           position: fixed;
           top: 0;

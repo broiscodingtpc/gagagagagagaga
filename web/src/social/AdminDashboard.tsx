@@ -144,7 +144,7 @@ const AdminDashboard: React.FC = () => {
     }
   };
 
-  const generatePost = async (eventType: string) => {
+  const _generatePost = async (eventType: string) => {
     setLoading(true);
     try {
       const response = await fetch('/api/social/generate', {
