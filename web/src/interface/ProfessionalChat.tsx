@@ -58,16 +58,20 @@ export function ProfessionalChat({ className = '' }: ProfessionalChatProps) {
       });
 
       const data = await response.json();
+      console.log('[Chat] API Response:', data);
       
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
-        text: data.reply || 'I am processing your request.',
+        text: data.text || data.reply || 'I am processing your request.',
         isUser: false,
         timestamp: new Date()
       };
+      
+      console.log('[Chat] AI Message:', aiMessage);
 
       setMessages(prev => [...prev, aiMessage]);
     } catch (error) {
+      console.error('[Chat] Error:', error);
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         text: 'Connection error. Please try again.',
